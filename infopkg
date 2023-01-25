@@ -1,0 +1,18 @@
+# Nome do mantenedor do pacote
+mantenedor=''
+# Email contato
+contato=''
+# Nome do pacote
+nomepacote=''
+# Versao do programa
+versao=''
+# Versao da Build
+build=''
+# licenca de uso
+licenca=''
+# pequena descricao
+descricao=''
+# homepage do projeto
+www=''
+# pagina do codigo fonte
+source=''

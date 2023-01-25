@@ -1,0 +1,79 @@
+#!/bin/sh
+#================================HEADER================================|
+#AUTHOR
+# Nicolas
+#
+#Versao
+# 1.1
+#
+#DESCRIÇÃO
+# pkginstall - 	Instala pacote gerado com o createpkg.
+#				E gerar um arquivo de track
+# Changelog
+#	(Versão 1.1)
+#		- Adicionado suporte a instalação de multiplos pacotes.
+#======================================================================|
+#
+#======================================================================|
+
+#====================CONFIGURAÇÕES
+# Rastreador de pacotes
+TRACK="/tmp/log/installed"
+REGEX_FILENAME="[^/]*$"
+#==================== TESTE
+# Criando diretorio do restreador.
+[ ! -d "$TRACK" ] && mkdir -vp "$TRACK"
+
+#=================== FUNCOES
+INSTALL(){
+	# nome do pacote
+	local package="$1"
+	name_pkg=$(basename "$package")
+	name_pkg="${name_pkg//.tpkg/}"
+
+	#informacao do usuario
+	printf "»Iniciando instalacao do pacote: $package\n"
+
+	if tar xvf "$package" -C / > "${TRACK}/${name_pkg}.tack"; then
+		printf "Pacote $name_pkg instalado com sucesso.\n"
+	else
+		pritnf "Pacote $name_pkg NAO FOI INSTALADO.\n"
+		exit 1
+	fi
+
+	# LIMPEZA 1
+	# Removendo ./ e linhas em branco
+	if sed -i 's,\.\/,/,g; /^$/d' "${TRACK}/${name_pkg}.tack" ;	then
+		printf "Limpeza executada...\n"
+	else
+		printf "Erro na limpeza.."
+		exit 1
+	fi
+}
+# Descrição do pacote
+DESC(){
+	local pkg="$@"
+
+	#verificando arquivos
+	if tar -tf "$pkg" "./desc/pkgdesc" 1>/dev/null 2>/dev/null;	then
+		printf "\nExiste o arquivo pkgdesc do ${pkg}\n"
+	fi
+}
+
+#==================== INICIO
+case $1 in
+	install)
+		shift;
+		while [ -n "$1" ]; do
+			if [ -e "$1" ]; then
+				DESC "$1"
+				INSTALL $1 #  chamada de funcao
+				shift
+				continue
+			else
+				printf "%s\n" "Pacote $1 nao existe"
+				exit 1
+			fi
+		done
+	;;
+esac
